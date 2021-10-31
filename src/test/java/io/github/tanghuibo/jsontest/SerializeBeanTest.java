@@ -5,6 +5,7 @@ import io.github.tanghuibo.jsontest.adapter.JsonAdapter;
 import io.github.tanghuibo.jsontest.adapter.impl.FastJsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.GsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.JacksonAdapterImpl;
+import io.github.tanghuibo.jsontest.utils.GcUtils;
 import io.github.tanghuibo.jsontest.utils.JsonBeanUtils;
 import io.github.tanghuibo.jsontest.utils.WriteUtils;
 import org.junit.Test;
@@ -41,18 +42,30 @@ public class SerializeBeanTest {
 
     public static Map<String, Long> performanceTest(JsonAdapter jsonAdapter) {
         Map<String, Long> map = new HashMap<>();
+
         for (int i = 1; i < 100; i++) {
-            Object data = JsonBeanUtils.buildFullDataObject("se" + jsonAdapter.getTag(), i);
-            long start = System.currentTimeMillis();
-            jsonAdapter.toJSONString(data);
-            map.put("init_" + i, System.currentTimeMillis() - start);
-            start = System.currentTimeMillis();
-            for (int j = 0; j < 10000; j++) {
-                jsonAdapter.toJSONString(data);
-            }
-            map.put("run_" + i, System.currentTimeMillis() - start);
+            performanceTest(jsonAdapter, map, "test", i, false);
         }
-        WriteUtils.writeToFile(" serialize/bean/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
+
+        for (int i = 1; i < 100; i++) {
+            performanceTest(jsonAdapter, map, "se", i, true);
+        }
+        WriteUtils.writeToFile("serialize/bean/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
         return map;
+    }
+
+    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, String namePrefix, int i, boolean needGc) {
+        if(needGc) {
+            GcUtils.gc();
+        }
+        Object data = JsonBeanUtils.buildFullDataObject(namePrefix + jsonAdapter.getTag(), i);
+        long start = System.currentTimeMillis();
+        jsonAdapter.toJSONString(data);
+        map.put("init_" + i, System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
+        for (int j = 0; j < 100000; j++) {
+            jsonAdapter.toJSONString(data);
+        }
+        map.put("run_" + i, System.currentTimeMillis() - start);
     }
 }

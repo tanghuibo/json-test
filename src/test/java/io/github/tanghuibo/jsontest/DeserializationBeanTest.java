@@ -5,6 +5,7 @@ import io.github.tanghuibo.jsontest.adapter.JsonAdapter;
 import io.github.tanghuibo.jsontest.adapter.impl.FastJsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.GsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.JacksonAdapterImpl;
+import io.github.tanghuibo.jsontest.utils.GcUtils;
 import io.github.tanghuibo.jsontest.utils.JsonBeanUtils;
 import io.github.tanghuibo.jsontest.utils.WriteUtils;
 import org.junit.Test;
@@ -30,6 +31,12 @@ public class DeserializationBeanTest {
     }
 
     @Test
+    public void fastjsonOptimizeTest() {
+        //字段排序后可以提升fastjson序列化性能
+        log.info("result {}", JSON.toJSONString(performanceTestWithReJson(new FastJsonAdapterImpl())));
+    }
+
+    @Test
     public void jacksonTest() {
         log.info("result {}", JSON.toJSONString(performanceTest(new JacksonAdapterImpl())));
     }
@@ -41,19 +48,57 @@ public class DeserializationBeanTest {
 
     public static Map<String, Long> performanceTest(JsonAdapter jsonAdapter) {
         Map<String, Long> map = new HashMap<>();
-        for (int i = 1; i < 100; i++) {
-            String jsonString = JsonBeanUtils.buildJsonString(i);
-            Class clazz = JsonBeanUtils.buildTestClass("de" + jsonAdapter.getTag(), i);
-            long start = System.currentTimeMillis();
-            jsonAdapter.toData(jsonString, clazz);
-            map.put("init_" + i, System.currentTimeMillis() - start);
-            start = System.currentTimeMillis();
-            for (int j = 0; j < 10000; j++) {
-                jsonAdapter.toData(jsonString, clazz);
-            }
-            map.put("run_" + i, System.currentTimeMillis() - start);
+        for (int i = 1; i < 10; i++) {
+            performanceTest(jsonAdapter, map, "deTest", i, false);
         }
-        WriteUtils.writeToFile(" deserialization/bean/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
+        for (int i = 1; i < 100; i++) {
+            performanceTest(jsonAdapter, map, "de", i, true);
+        }
+        WriteUtils.writeToFile("deserialization/bean/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
         return map;
+    }
+
+    public static Map<String, Long> performanceTestWithReJson(JsonAdapter jsonAdapter) {
+        Map<String, Long> map = new HashMap<>();
+        for (int i = 1; i < 10; i++) {
+            performanceTestWithReJson(jsonAdapter, map, "deTest", i, false);
+        }
+        for (int i = 1; i < 100; i++) {
+            performanceTestWithReJson(jsonAdapter, map, "de", i, true);
+        }
+        WriteUtils.writeToFile("deserialization/bean/" + jsonAdapter.getTag()+ "_优化后" + ".json", JSON.toJSONString(map));
+        return map;
+    }
+
+    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, String namePrefix, int i, boolean needGc) {
+        if(needGc) {
+            GcUtils.gc();
+        }
+        String jsonString = JsonBeanUtils.buildJsonString(i);
+        Class clazz = JsonBeanUtils.buildTestClass(namePrefix + jsonAdapter.getTag(), i);
+        long start = System.currentTimeMillis();
+        jsonAdapter.toData(jsonString, clazz);
+        map.put("init_" + i, System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
+        for (int j = 0; j < 100000; j++) {
+            jsonAdapter.toData(jsonString, clazz);
+        }
+        map.put("run_" + i, System.currentTimeMillis() - start);
+    }
+
+    private static void performanceTestWithReJson(JsonAdapter jsonAdapter, Map<String, Long> map, String namePrefix, int i, boolean needGc) {
+        if(needGc) {
+            GcUtils.gc();
+        }
+        String jsonString = JsonBeanUtils.buildJsonString(i);
+        Class clazz = JsonBeanUtils.buildTestClass(namePrefix + jsonAdapter.getTag(), i);
+        long start = System.currentTimeMillis();
+        jsonString = jsonAdapter.toJSONString(jsonAdapter.toData(jsonString, clazz));
+        map.put("init_" + i, System.currentTimeMillis() - start);
+        start = System.currentTimeMillis();
+        for (int j = 0; j < 100000; j++) {
+            jsonAdapter.toData(jsonString, clazz);
+        }
+        map.put("run_" + i, System.currentTimeMillis() - start);
     }
 }
