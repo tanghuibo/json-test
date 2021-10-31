@@ -16,12 +16,12 @@ import java.util.Map;
 public class FastJsonAdapterImpl implements JsonAdapter {
     @Override
     public String toJSONString(Object data) {
-        return JSON.toJSONString(data, SerializerFeature.WriteClassName);
+        return JSON.toJSONString(data);
     }
 
     @Override
     public <T> T toData(String json, Class<T> tClass) {
-        return JSON.parseObject(json, tClass, Feature.SupportAutoType);
+        return JSON.parseObject(json, tClass);
 
     }
 

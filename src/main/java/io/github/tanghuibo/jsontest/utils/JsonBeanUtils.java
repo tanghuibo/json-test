@@ -1,6 +1,8 @@
 package io.github.tanghuibo.jsontest.utils;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * JsonTestBeanUtils
@@ -29,6 +31,27 @@ public class JsonBeanUtils {
 
     public static Object buildFullDataObject(String name, int filedCount) {
         return buildFullDataObject(buildTestClass(name, filedCount), filedCount);
+    }
+
+    public static Map<String, String> buildFullDataMap(int filedCount) {
+        Map<String, String> map = new HashMap<>(filedCount);
+        for (int i = 0; i < filedCount; i++) {
+            map.put(buildFiledName(i), buildFiledName(i));
+        }
+        return map;
+    }
+
+    public static String buildJsonString(int filedCount) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
+        for (int i = 0; i < filedCount; i++) {
+            stringBuilder.append("\"" + buildFiledName(i) + "\":\"" + buildFiledName(i) + "\"");
+            if(i != filedCount - 1) {
+                stringBuilder.append(",");
+            }
+        }
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
 
     private static Object buildFullDataObject(Class clazz, int filedCount) {

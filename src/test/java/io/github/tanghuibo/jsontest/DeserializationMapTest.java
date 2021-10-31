@@ -6,6 +6,7 @@ import io.github.tanghuibo.jsontest.adapter.impl.FastJsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.GsonAdapterImpl;
 import io.github.tanghuibo.jsontest.adapter.impl.JacksonAdapterImpl;
 import io.github.tanghuibo.jsontest.utils.JsonBeanUtils;
+import io.github.tanghuibo.jsontest.utils.WriteUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * SerializeTest
+ * SerializeBeanTest
  *
  * @author tanghuibo
  * @date 2021/10/31 15:09
  */
-public class SerializeTest {
+public class DeserializationMapTest {
 
-    Logger log = LoggerFactory.getLogger(SerializeTest.class);
+    Logger log = LoggerFactory.getLogger(DeserializationMapTest.class);
 
     @Test
     public void fastjsonTest() {
@@ -41,16 +42,17 @@ public class SerializeTest {
     public static Map<String, Long> performanceTest(JsonAdapter jsonAdapter) {
         Map<String, Long> map = new HashMap<>();
         for (int i = 1; i < 100; i++) {
-            Object data = JsonBeanUtils.buildFullDataObject(jsonAdapter.getTag(), i);
+            String jsonString = JsonBeanUtils.buildJsonString(i);
             long start = System.currentTimeMillis();
-            jsonAdapter.toJSONString(data);
+            jsonAdapter.toMap(jsonString);
             map.put("init_" + i, System.currentTimeMillis() - start);
             start = System.currentTimeMillis();
             for (int j = 0; j < 10000; j++) {
-                jsonAdapter.toJSONString(data);
+                jsonAdapter.toMap(jsonString);
             }
             map.put("run_" + i, System.currentTimeMillis() - start);
         }
+        WriteUtils.writeToFile(" deserialization/map/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
         return map;
     }
 }
