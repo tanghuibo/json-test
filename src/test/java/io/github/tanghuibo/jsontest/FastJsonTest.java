@@ -2,6 +2,7 @@ package io.github.tanghuibo.jsontest;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.parser.JSONLexerBase;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * FastJsonTest
@@ -175,6 +176,18 @@ public class FastJsonTest {
         JSON.parseObject(json63, Json63.class);
 
 
+    }
+
+    @Test
+    public void featurePrint() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (Feature value : Feature.values()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", value.name());
+            map.put("mask", value.mask);
+            list.add(map);
+        }
+        System.out.println(JSON.toJSONString(list));
     }
 
 
