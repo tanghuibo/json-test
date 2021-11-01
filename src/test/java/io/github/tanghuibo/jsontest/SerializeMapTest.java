@@ -42,20 +42,14 @@ public class SerializeMapTest {
 
     public static Map<String, Long> performanceTest(JsonAdapter jsonAdapter) {
         Map<String, Long> map = new HashMap<>();
+
         for (int i = 1; i < 100; i++) {
-            performanceTest(jsonAdapter, map, i, false);
+            performanceTest(jsonAdapter, map, i);
         }
-        for (int i = 1; i < 100; i++) {
-            performanceTest(jsonAdapter, map, i, true);
-        }
-        WriteUtils.writeToFile("serialize/map/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
         return map;
     }
 
-    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, int i, boolean needGc) {
-        if(needGc) {
-            GcUtils.gc();
-        }
+    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, int i) {
         Map<String, String> data = JsonBeanUtils.buildFullDataMap(i);
         long start = System.currentTimeMillis();
         jsonAdapter.toJSONString(data);

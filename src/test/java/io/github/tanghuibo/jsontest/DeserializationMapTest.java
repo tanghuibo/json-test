@@ -42,20 +42,13 @@ public class DeserializationMapTest {
 
     public static Map<String, Long> performanceTest(JsonAdapter jsonAdapter) {
         Map<String, Long> map = new HashMap<>();
-        for (int i = 1; i < 10; i++) {
-            performanceTest(jsonAdapter, map, i, false);
-        }
         for (int i = 1; i < 100; i++) {
-            performanceTest(jsonAdapter, map, i, true);
+            performanceTest(jsonAdapter, map, i);
         }
-        WriteUtils.writeToFile("deserialization/map/" + jsonAdapter.getTag() + ".json", JSON.toJSONString(map));
         return map;
     }
 
-    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, int i, boolean needGc) {
-        if(needGc) {
-            GcUtils.gc();
-        }
+    private static void performanceTest(JsonAdapter jsonAdapter, Map<String, Long> map, int i) {
         String jsonString = JsonBeanUtils.buildJsonString(i);
         long start = System.currentTimeMillis();
         jsonAdapter.toMap(jsonString);

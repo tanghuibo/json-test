@@ -63,6 +63,7 @@ public class FastJsonTest {
                 .peek(m -> m.setAccessible(true))
                 .findFirst()
                 .orElse(null);
+
         FastjsonASMDeserializerJson62 fastjsonASMDeserializerJson62 = new FastjsonASMDeserializerJson62(
                 ParserConfig.getGlobalInstance(), JavaBeanInfo.build(Json62.class,
                 Json62.class,
@@ -188,6 +189,29 @@ public class FastJsonTest {
             list.add(map);
         }
         System.out.println(JSON.toJSONString(list));
+    }
+
+    @Test
+    public void test() {
+        System.out.println(JSON.toJSONString(buildMap()));
+    }
+
+    private Map<String, Object> buildMap() {
+        Map<String, Object> map = new HashMap<String, Object>(99) {
+            @Override
+            public Object get(Object key) {
+                return super.get(key);
+            }
+
+            @Override
+            public Set<Entry<String, Object>> entrySet() {
+                return super.entrySet();
+            }
+        };
+        for (int i = 0; i < 99; i++) {
+            map.put("filedTest" + i, "filedTest" + i);
+        }
+        return map;
     }
 
 

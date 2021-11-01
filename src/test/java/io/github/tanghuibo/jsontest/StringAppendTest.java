@@ -3,11 +3,8 @@ package io.github.tanghuibo.jsontest;
 import com.alibaba.fastjson.serializer.SerializeWriter;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.BufferRecyclers;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonWriter;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,16 +17,16 @@ import java.util.Map;
  */
 public class StringAppendTest {
 
-    private int runCount = 100000;
-    private int wordCount = 99;
+    private final int RUN_COUNT = 100000;
+    private final int WORD_COUNT = 99;
 
     @Test
     public void fastjsonTest() {
         //896
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             SerializeWriter out = new SerializeWriter();
-            for (int j = 0; j < wordCount; j++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
                 out.write("\"filedTest");
                 out.write(j);
                 out.write("\":\"filedTest");
@@ -42,19 +39,19 @@ public class StringAppendTest {
     }
 
     @Test
-    public void gsonTest() throws IOException {
+    public void gsonTest() {
         //1763
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
-            StringWriter stringWriter = new StringWriter();
-            JsonWriter out = new JsonWriter(Streams.writerForAppendable(stringWriter));
-            out.beginObject();
-            for (int j = 0; j < wordCount; j++) {
-                out.name("filedTest" + j);
-                out.value("filedTest" + j);
+        for (int i = 0; i < RUN_COUNT; i++) {
+            StringWriter out = new StringWriter();
+            for (int j = 0; j < WORD_COUNT; j++) {
+                out.append("\"filedTest");
+                out.append(j + "");
+                out.append("\":\"filedTest");
+                out.append(j + "");
+                out.append("\",");
             }
-            out.endObject();
-            stringWriter.toString();
+            out.toString();
         }
         System.out.println("gson:" + (System.currentTimeMillis() -  t1));
     }
@@ -63,9 +60,9 @@ public class StringAppendTest {
     public void jacksonTest() {
         //746
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             SegmentedStringWriter out = new SegmentedStringWriter(BufferRecyclers.getBufferRecycler());
-            for (int j = 0; j < wordCount; j++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
                 out.write("\"filedTest");
                 out.write(j);
                 out.write("\":\"filedTest");
@@ -82,9 +79,9 @@ public class StringAppendTest {
     public void stringBuilder() {
         //1002
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             StringBuilder out = new StringBuilder(3000);
-            for (int j = 0; j < wordCount; j++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
                 out.append("\"filedTest");
                 out.append(j);
                 out.append("\":\"filedTest");
@@ -100,9 +97,9 @@ public class StringAppendTest {
     public void stringTest() {
         //1002
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             String str = "";
-            for (int j = 0; j < wordCount; j++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
                 str = str + "\"filedTest" + j + "\":\"filedTest" + j + "\",";
 
             }
@@ -114,9 +111,9 @@ public class StringAppendTest {
     public void stringBufferTest() {
         //2199
         long t1 = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             StringBuffer out = new StringBuffer(3000);
-            for (int j = 0; j < wordCount; j++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
                 out.append("\"filedTest");
                 out.append(j);
                 out.append("\":\"filedTest");
@@ -133,7 +130,7 @@ public class StringAppendTest {
         Map<String, Object> map = buildMap();
         long t1 = System.currentTimeMillis();
 
-        for (int i = 0; i < runCount; i++) {
+        for (int i = 0; i < RUN_COUNT; i++) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 entry.getKey();
                 entry.getValue();
@@ -143,8 +140,8 @@ public class StringAppendTest {
     }
 
     private Map<String, Object> buildMap() {
-        Map<String, Object> map = new HashMap<>(wordCount);
-        for (int i = 0; i < wordCount; i++) {
+        Map<String, Object> map = new HashMap<>(WORD_COUNT);
+        for (int i = 0; i < WORD_COUNT; i++) {
             map.put("filedTest" + i, "filedTest" + i);
         }
         return map;
