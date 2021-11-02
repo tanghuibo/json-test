@@ -6,6 +6,7 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.parser.JSONLexerBase;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.JavaBeanInfo;
 import com.alibaba.fastjson.util.TypeUtils;
 import io.github.tanghuibo.jsontest.fastjson.FastjsonASMDeserializerJson62;
@@ -183,6 +184,18 @@ public class FastJsonTest {
     public void featurePrint() {
         List<Map<String, Object>> list = new ArrayList<>();
         for (Feature value : Feature.values()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", value.name());
+            map.put("mask", value.mask);
+            list.add(map);
+        }
+        System.out.println(JSON.toJSONString(list));
+    }
+
+    @Test
+    public void serializerFeaturePrint() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (SerializerFeature value : SerializerFeature.values()) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", value.name());
             map.put("mask", value.mask);
