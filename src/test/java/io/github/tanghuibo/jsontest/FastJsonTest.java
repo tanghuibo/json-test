@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.awt.List;
 import java.util.*;
 
 /**
@@ -182,7 +183,7 @@ public class FastJsonTest {
 
     @Test
     public void featurePrint() {
-        List<Map<String, Object>> list = new ArrayList<>();
+        java.util.List<Map<String, Object>> list = new ArrayList<>();
         for (Feature value : Feature.values()) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", value.name());
@@ -194,7 +195,7 @@ public class FastJsonTest {
 
     @Test
     public void serializerFeaturePrint() {
-        List<Map<String, Object>> list = new ArrayList<>();
+        java.util.List<Map<String, Object>> list = new ArrayList<>();
         for (SerializerFeature value : SerializerFeature.values()) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", value.name());
@@ -225,6 +226,14 @@ public class FastJsonTest {
             map.put("filedTest" + i, "filedTest" + i);
         }
         return map;
+    }
+
+    @Test
+    public void awtListTest() {
+        List list = new List();
+        list.add("test1");
+        list.add("test2");
+        JSON.toJSONString(list, SerializerFeature.IgnoreErrorGetter);
     }
 
 
