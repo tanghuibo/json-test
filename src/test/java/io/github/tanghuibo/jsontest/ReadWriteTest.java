@@ -83,13 +83,25 @@ public class ReadWriteTest {
     }
 
     @Test
-    public void readMapTest() {
-        long t1 = System.currentTimeMillis();
+    public void readMapEntrySetTest() {
         Map<String, Object> map = buildMap();
+        long t1 = System.currentTimeMillis();
         for (int i = 0; i < RUN_COUNT; i++) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 entry.getKey();
                 entry.getValue();
+            }
+        }
+        System.out.println("read map:" + (System.currentTimeMillis() - t1));
+    }
+
+    @Test
+    public void readMapTest() {
+        Map<String, Object> map = buildMap();
+        long t1 = System.currentTimeMillis();
+        for (int i = 0; i < RUN_COUNT; i++) {
+            for (int j = 0; j < WORD_COUNT; j++) {
+                map.get("filedTest" + j);
             }
         }
         System.out.println("read map:" + (System.currentTimeMillis() - t1));

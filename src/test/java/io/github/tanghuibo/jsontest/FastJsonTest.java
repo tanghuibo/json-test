@@ -1,6 +1,7 @@
 package io.github.tanghuibo.jsontest;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.parser.JSONLexerBase;
@@ -15,6 +16,7 @@ import io.github.tanghuibo.jsontest.fastjson.Json62;
 import io.github.tanghuibo.jsontest.fastjson.Json63;
 import io.github.tanghuibo.jsontest.utils.JsonBeanUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -23,6 +25,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.awt.List;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -234,6 +239,30 @@ public class FastJsonTest {
         list.add("test1");
         list.add("test2");
         JSON.toJSONString(list, SerializerFeature.IgnoreErrorGetter);
+    }
+
+    @Test
+    public void testJsonPath() throws IOException {
+        String idList = System.getenv("testIdList");
+        for (String id : idList.split(",")) {
+            testJsonPath(id);
+        }
+    }
+
+    private void testJsonPath(String id) throws IOException {
+        URL url = new URL(System.getenv("baseUrl") + "?id=" + id);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Cookie", System.getenv("cookie"));
+        conn.connect();
+        String json = IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8);
+
+        String m3u81080pUrl = (String) JSONPath.extract(json, "$.data.format[video_bitrate='1080P'].format_info_file.file_info[file_type='M3U8'].file_url[0]");
+        String assSubtitleUrl = (String) JSONPath.extract(json, "$.data.subtitle[language_type=1].source_filepath[0]");
+        System.out.println("query url: " + url);
+        System.out.println("m3u81080pUrl: " + m3u81080pUrl);
+        System.out.println("assSubtitleUrl: " + assSubtitleUrl);
+        System.out.println("======================");
     }
 
 
